@@ -52,13 +52,13 @@ static LIST_HEAD(shareMemKey);
 
 // First 1 MB for the kernel boot
 #ifdef k210
-    #define INIT_KERNEL_STACK 0xffffffc080100000lu
-    #define INIT_KERNEL_STACK_MSTER 0xffffffc080101000lu
-    #define INIT_KERNEL_STACK_SLAVE 0xffffffc080102000lu
+    #define INIT_KERNEL_STACK 0xffffffc08021e000lu
+    #define INIT_KERNEL_STACK_MSTER 0xffffffc08021f000lu
+    #define INIT_KERNEL_STACK_SLAVE 0xffffffc080220000lu
 #else 
-    #define INIT_KERNEL_STACK 0xffffffc080300000lu
-    #define INIT_KERNEL_STACK_MSTER 0xffffffc080301000lu
-    #define INIT_KERNEL_STACK_SLAVE 0xffffffc080302000lu
+    #define INIT_KERNEL_STACK 0xffffffc08040e000lu
+    #define INIT_KERNEL_STACK_MSTER 0xffffffc08040f000lu
+    #define INIT_KERNEL_STACK_SLAVE 0xffffffc080410000lu
 #endif
 
 // pcb user stack message
@@ -78,12 +78,9 @@ static LIST_HEAD(shareMemKey);
 #pragma(8)
 typedef struct page_node{
     list_node_t list;
-    volatile PTE * page_pte;
     uint64_t kva_begin; /* the va of the page */
-    uint64_t sd_sec;    /* last time in SD place */
     uint8_t share_num;  /* share page number */
     uint8_t is_share;   /* maybe for the shm_pg_get */
-    
 }page_node_t;
 #pragma()
 
@@ -96,7 +93,6 @@ extern source_manager_t freePageManager;
 #define ROUNDDOWN(a, n) (((uint64_t)(a)) & ~((n)-1))
 
 extern ptr_t memCurr;
-extern list_node_t bioPageList;
 
 /* 记录回收的页的信息 */
 #pragma(8)
@@ -165,7 +161,7 @@ uintptr_t unmap_write_back(void * start, uint64_t len, fd_t *nfd, uintptr_t pgdi
 /* recycle */
 int recycle_page_default(uintptr_t pgdir);
 int recycle_page_voilent(uintptr_t pgdir);
-int recycle_page_part(uintptr_t pgdir, void *exe_load, uint64_t edata);
+int recycle_page_part(uintptr_t pgdir, void *recyclePcb);
 
 /* change the data  */
 uint64_t do_brk(uintptr_t ptr);
@@ -175,18 +171,10 @@ int do_madvise(void* addr, size_t len, int notice);
 int do_membarrier(int cmd, int flags);
 /* deal the mmirq with clone no W set */
 void deal_no_W(uint64_t fault_addr);
-void deal_no_alloc(uint64_t fault_addr, uint64_t mode);
-void deal_in_SD(uint64_t fault_addr);
 /* alloc_page_helper addr ok */ 
 uint8 is_legal_addr(uint64_t fault_addr);
 void share_add(uint64_t baseAddr);
 void share_sub(uint64_t baseAddr);
 // membarrier
 int do_membarrier(int cmd, int flags);
-
-void load_lazy_mmap(uint64_t fault_addr, uint64_t kva);
-
-void *visit_command_line();
-
-
 #endif /* MM_H */

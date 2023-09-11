@@ -86,7 +86,6 @@ pid_t getpid();
 uint8_t sys_disk_read(uint8_t *data_buff, uint32_t sector, uint32_t count);
 uint8_t sys_disk_write(uint8_t *data_buff, uint32_t sector, uint32_t count);
 
-uint64_t extend(uint64_t num, int how, uint64_t threlod);
 
 int open(const char *path, int flags);
 int32_t close(uint32_t fd);

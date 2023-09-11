@@ -278,17 +278,7 @@ uintptr_t alloc_page_helper(uintptr_t va, uintptr_t pgdir, uint64_t mode)
                         | _PAGE_EXEC  | (mode == MAP_KERNEL ? (_PAGE_ACCESSED | _PAGE_DIRTY) :
                           _PAGE_USER);   
     /* final page */
-    uint64_t final_page = check_page_set_flag(third_page, vpn[0], pte_flags) | (va & (uint64_t)0x0fff);
-
-    // just for the status ctx
-    if (status_ctx)
-    {
-        page_node_t * final_node = &pageRecyc[GET_MEM_NODE(final_page)];
-        final_node->sd_sec = 0;
-        final_node->page_pte = &third_page[vpn[0]];
-    }
-
-    return final_page;
+    return check_page_set_flag(third_page, vpn[0], pte_flags) | (va & (uint64_t)0x0fff);
 
 }
 
@@ -324,12 +314,6 @@ PTE * alloc_page_point_phyc(uintptr_t va, uintptr_t pgdir, uint64_t kva, uint64_
                         | _PAGE_EXEC  | (mode == MAP_KERNEL ? (_PAGE_ACCESSED | _PAGE_DIRTY) :
                           _PAGE_USER);
     set_attribute(&third_page[vpn[0]], pte_flags);
-    if (status_ctx)
-    {
-        page_node_t * final_node = &pageRecyc[GET_MEM_NODE(kva)];
-        final_node->sd_sec = 0;
-        final_node->page_pte = &third_page[vpn[0]];
-    }    
     return &third_page[vpn[0]];     
 }
 
@@ -489,12 +473,4 @@ uintptr_t unmap_write_back(void * start, uint64_t len, fd_t *nfd, uintptr_t pgdi
         }
     }
     return 0;
-}
-
-
-void *visit_command_line()
-{
-    pcb_t * current_running = get_current_running();
-
-    return (void *)(current_running->user_stack_top + 8);
 }

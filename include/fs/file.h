@@ -6,7 +6,6 @@
 #include <os/errno.h>
 
 #define MAX_FD_NUM 110
-#define MAX_FD_TABLE 5
 #define MAX_FILE_NUM (mylimit.rlim_cur) // actually it is current_running->fd_limit.rlim_cur, but if so, the invalid float instruction panic will occurred due to unknown reason
 // #define MAX_FILE_NUM ((((pcb_t *)get_current_running())->fd_limit.rlim_cur == -1)?(MAX_FD_NUM):((pcb_t *)get_current_running())->fd_limit.rlim_cur)
 
@@ -140,7 +139,6 @@ typedef struct fd{
     // int   share_num;
     // long version;
 }fd_t;
-
 
 typedef struct pfd_table{
     int used; 

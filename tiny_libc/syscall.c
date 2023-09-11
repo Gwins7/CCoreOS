@@ -97,8 +97,3 @@ int sys_pre_load(const char * file_name, int how)
 {
     return invoke_syscall(SYS_preload, file_name, how, IGNORE, IGNORE, IGNORE, IGNORE);
 }
-
-uint64_t extend(uint64_t num, int how, uint64_t threlod)
-{
-    return invoke_syscall(SYS_extend, num, how, threlod, IGNORE, IGNORE, IGNORE);
-}

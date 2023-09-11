@@ -13,6 +13,7 @@
  */
 uint64_t do_brk(uintptr_t ptr)
 {
+    // printk("[brk] ptr = 0x%x\n",ptr);
     pcb_t *current_running = get_current_running();
     if (ptr > current_running->user_stack_base) 
     {
@@ -37,7 +38,6 @@ uint64_t do_brk(uintptr_t ptr)
     {
         for (uintptr_t my_ptr = current_running->edata; my_ptr < ptr; my_ptr += NORMAL_PAGE_SIZE)
         {
-            if (status_ctx) continue;
             alloc_page_helper(my_ptr, current_running->pgdir, MAP_USER);
             local_flush_tlb_all();
         }

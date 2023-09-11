@@ -5,15 +5,12 @@
 #include <os/string.h>
 #include <os/stdio.h>
 #include <os/mm.h>
-#include <swap/swap.h>
-#include <sys/special_ctx.h>
 #include <assert.h>
 #include <sbi.h>
 #include <sbi_rust.h>
 #include <screen.h>
 #include <csr.h>
 #include <sdcard.h>
-
 handler_t irq_table[IRQC_COUNT];
 handler_t exc_table[EXCC_COUNT];
 uintptr_t riscv_dtb;
@@ -51,13 +48,11 @@ void interrupt_helper(regs_context_t *regs, uint64_t stval, uint64_t cause)
     // printk("interrupt end\n");
 }
 
-// handle int
 void handle_int(regs_context_t *regs, uint64_t interrupt, uint64_t cause)
 {
     reset_irq_timer();
 }
 
-// handle page fault inst
 void handle_page_fault_inst(regs_context_t *regs, uint64_t stval, uint64_t cause){
     // printk("inst page fault: %lx\n",stval);
     pcb_t * current_running = get_current_running();
@@ -70,7 +65,62 @@ void handle_page_fault_inst(regs_context_t *regs, uint64_t stval, uint64_t cause
     handle_other(regs,stval,cause);
 }
 
-// handle page fault load
+void load_lazy_mmap(uint64_t fault_addr, uint64_t kva){
+    pcb_t * current_running = get_current_running();
+    //search for lazy mmap (if the fault_addr is in some fd's map zone)
+    for (int i=0; i<MAX_FILE_NUM; i++) {
+        fd_t *nfd = &current_running->pfd[i];
+        if (nfd->used && nfd->mmap.used &&
+            fault_addr >= (uint64_t)nfd->mmap.start && 
+            fault_addr <= (uint64_t)nfd->mmap.len + (uint64_t)nfd->mmap.start){
+                
+            // save fd's offset
+            int old_seek = fat32_lseek(nfd->fd_num, 0, SEEK_CUR);
+            void *start = nfd->mmap.start;
+            int len = nfd->mmap.len;
+            // void *cur_page = ROUNDDOWN(fault_addr,NORMAL_PAGE_SIZE);
+            // 1. find the base
+            uint64_t left_page = fault_addr - ROUNDDOWN(fault_addr,NORMAL_PAGE_SIZE);
+            uint64_t begin; 
+            if (fault_addr & 0xfff)
+                begin = (fault_addr - (uint64_t)start) > left_page ? ROUNDDOWN(kva,NORMAL_PAGE_SIZE)
+                                    : kva - (fault_addr - (uint64_t)start);
+            else 
+                begin = kva;
+            // 2. find the high
+            uint64_t mmap_end = (uint64_t)start + len;
+            uint64_t end;
+            if (fault_addr & 0xfff)
+                end = (mmap_end - fault_addr) > ROUND(fault_addr,NORMAL_PAGE_SIZE) - fault_addr ?
+                            ROUND(kva,NORMAL_PAGE_SIZE) : kva + (mmap_end - fault_addr);
+            else 
+                end = kva + MIN(mmap_end - fault_addr, PAGE_SIZE);
+            
+            fat32_lseek(nfd->fd_num, nfd->mmap.off + (fault_addr - (uint64_t)start), SEEK_SET);
+            fat32_read(nfd->fd_num, begin, (end - begin));
+            // if it is the first page of mmap
+            // if (fault_addr <= ROUND(nfd->mmap.start,NORMAL_PAGE_SIZE)){
+            //     fat32_lseek(nfd->fd_num,nfd->mmap.off,SEEK_SET);
+            //     fat32_read(nfd->fd_num,nfd->mmap.start,ROUND(nfd->mmap.start,NORMAL_PAGE_SIZE)-(uint64_t)nfd->mmap.start);
+            // }
+            // // if it's not the first page of mmap
+            // else {
+            //     uint64_t file_off = ROUNDDOWN(fault_addr,NORMAL_PAGE_SIZE) - (uint64_t)nfd->mmap.start;
+            //     fat32_lseek(nfd->fd_num,nfd->mmap.off + file_off,SEEK_SET);
+            //     // if it's the last page of mmap
+            //     fat32_read(nfd->fd_num,ROUNDDOWN(fault_addr,NORMAL_PAGE_SIZE),
+            //                 (ROUNDDOWN(fault_addr,NORMAL_PAGE_SIZE) + NORMAL_PAGE_SIZE >= (uint64_t)(nfd->mmap.start+nfd->mmap.len))
+            //                     ? (uint64_t)(nfd->mmap.start+nfd->mmap.len)%NORMAL_PAGE_SIZE : NORMAL_PAGE_SIZE);
+            // }
+
+
+            // restore fd's offset
+            fat32_lseek(nfd->fd_num,old_seek,SEEK_SET);
+            }
+        }
+}
+
+
 void handle_page_fault_load(regs_context_t *regs, uint64_t stval, uint64_t cause){
     // printk("load page fault: %lx\n",stval);
     pcb_t * current_running = get_current_running();
@@ -82,19 +132,14 @@ void handle_page_fault_load(regs_context_t *regs, uint64_t stval, uint64_t cause
         local_flush_tlb_all();
         break;
     case IN_SD:
-        // TODO
-        if (status_ctx)
-        {
-            deal_in_SD(fault_addr);
-            local_flush_tlb_all();            
-        } else assert(0);
-
+        prints("> Attention: the 0x%lx addr was swapped to SD! the origin physical addr is 0x%lx\n", 
+        fault_addr, kva2pa(get_pfn_of(fault_addr, current_running->pgdir)));
         break; 
     case NO_ALLOC:
         if (!is_legal_addr(stval))
             handle_other(regs, stval, cause);
-        // deal the no alloc
-        deal_no_alloc(fault_addr, LOAD);
+        kva =  alloc_page_helper(fault_addr, current_running->pgdir, MAP_USER);
+        load_lazy_mmap(fault_addr, kva);
         current_running->pge_num++;
         local_flush_tlb_all();
         break;              
@@ -104,7 +149,6 @@ void handle_page_fault_load(regs_context_t *regs, uint64_t stval, uint64_t cause
     // printk("load page end\n");
 }
 
-// handle page fault store
 void handle_page_fault_store(regs_context_t *regs, uint64_t stval, uint64_t cause){
     // printk("store page fault: %lx\n",stval);
     if (is_kva(stval))
@@ -118,25 +162,16 @@ void handle_page_fault_store(regs_context_t *regs, uint64_t stval, uint64_t caus
         local_flush_tlb_all();
         break;
     case IN_SD:
-        // TODO
-        if (status_ctx)
-        {
-            deal_in_SD(fault_addr);
-            local_flush_tlb_all();            
-        } else assert(0);
-
-        local_flush_tlb_all();
         break; 
     case IN_SD_NO_W:
-        assert(0);
         break; 
     case NO_W:
         deal_no_W(fault_addr);
         local_flush_tlb_all();
         break;
     case NO_ALLOC:
-        // deal no alloc 
-        deal_no_alloc(fault_addr, STORE);
+        kva =  alloc_page_helper(fault_addr, current_running->pgdir, MAP_USER);
+        load_lazy_mmap(fault_addr, ROUNDDOWN(kva, 0x1000));
         current_running->pge_num++;  
         local_flush_tlb_all();
         break;      
@@ -262,7 +297,7 @@ void debug_info(regs_context_t *regs, uint64_t stval, uint64_t cause)
     // printk("process name: %s, pid:%d\n", pcb->name, pcb->pid);
     //printk("sstatus: 0x%lx sbadaddr: 0x%lx scause: %lx\n\r",regs->sstatus, regs->sbadaddr, regs->scause);
     // printk("stval: 0x%lx cause: %lx\n\r",stval, cause);
-    // printk("sepc: 0x%lx\n\r", regs->sepc);
+    printk("sepc: 0x%lx\n\r", regs->sepc);
     //printk("mhartid: 0x%lx\n\r", get_current_cpu_id());
 
     // uintptr_t fp = regs->regs[8], sp = regs->regs[2];
@@ -388,7 +423,6 @@ char *syscall_array[] = {
     "SYS_getgid            ",
     "SYS_msync             ",
     "SYS_renameat2         ",
-    "SYS_extend            "
 };
 
 void init_syscall_name(){
@@ -494,6 +528,5 @@ void init_syscall_name(){
     syscall_name[176] = syscall_array[99];
     syscall_name[227] = syscall_array[100];
     syscall_name[276] = syscall_array[101];
-    syscall_name[254] = syscall_array[102];
 
 }

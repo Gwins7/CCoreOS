@@ -1,0 +1,11 @@
+fsf_callg_bl.o: fsf_callg_bl.c \
+ /home/stu/riscv64--musl--bleeding-edge-2020.08-1/riscv64-buildroot-linux-musl/sysroot/usr/include/stdc-predef.h \
+ /home/stu/riscv64--musl--bleeding-edge-2020.08-1/riscv64-buildroot-linux-musl/sysroot/usr/include/stdio.h \
+ /home/stu/riscv64--musl--bleeding-edge-2020.08-1/riscv64-buildroot-linux-musl/sysroot/usr/include/features.h \
+ /home/stu/riscv64--musl--bleeding-edge-2020.08-1/riscv64-buildroot-linux-musl/sysroot/usr/include/bits/alltypes.h \
+ ../include/ansidecl.h
+/home/stu/riscv64--musl--bleeding-edge-2020.08-1/riscv64-buildroot-linux-musl/sysroot/usr/include/stdc-predef.h:
+/home/stu/riscv64--musl--bleeding-edge-2020.08-1/riscv64-buildroot-linux-musl/sysroot/usr/include/stdio.h:
+/home/stu/riscv64--musl--bleeding-edge-2020.08-1/riscv64-buildroot-linux-musl/sysroot/usr/include/features.h:
+/home/stu/riscv64--musl--bleeding-edge-2020.08-1/riscv64-buildroot-linux-musl/sysroot/usr/include/bits/alltypes.h:
+../include/ansidecl.h:

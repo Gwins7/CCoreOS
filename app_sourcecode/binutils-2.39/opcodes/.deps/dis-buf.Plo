@@ -1,0 +1,52 @@
+dis-buf.lo: dis-buf.c \
+ /home/stu/riscv64--musl--bleeding-edge-2020.08-1/riscv64-buildroot-linux-musl/sysroot/usr/include/stdc-predef.h \
+ sysdep.h config.h \
+ /home/stu/riscv64--musl--bleeding-edge-2020.08-1/riscv64-buildroot-linux-musl/sysroot/usr/include/stdlib.h \
+ /home/stu/riscv64--musl--bleeding-edge-2020.08-1/riscv64-buildroot-linux-musl/sysroot/usr/include/features.h \
+ /home/stu/riscv64--musl--bleeding-edge-2020.08-1/riscv64-buildroot-linux-musl/sysroot/usr/include/bits/alltypes.h \
+ /home/stu/riscv64--musl--bleeding-edge-2020.08-1/riscv64-buildroot-linux-musl/sysroot/usr/include/alloca.h \
+ /home/stu/riscv64--musl--bleeding-edge-2020.08-1/riscv64-buildroot-linux-musl/sysroot/usr/include/string.h \
+ /home/stu/riscv64--musl--bleeding-edge-2020.08-1/riscv64-buildroot-linux-musl/sysroot/usr/include/strings.h \
+ ../include/ansidecl.h ../include/dis-asm.h \
+ /home/stu/riscv64--musl--bleeding-edge-2020.08-1/riscv64-buildroot-linux-musl/sysroot/usr/include/stdio.h \
+ ../bfd/bfd.h ../include/symcat.h \
+ /home/stu/riscv64--musl--bleeding-edge-2020.08-1/lib/gcc/riscv64-buildroot-linux-musl/10.2.0/include/stdint.h \
+ /home/stu/riscv64--musl--bleeding-edge-2020.08-1/riscv64-buildroot-linux-musl/sysroot/usr/include/stdint.h \
+ /home/stu/riscv64--musl--bleeding-edge-2020.08-1/riscv64-buildroot-linux-musl/sysroot/usr/include/bits/stdint.h \
+ /home/stu/riscv64--musl--bleeding-edge-2020.08-1/lib/gcc/riscv64-buildroot-linux-musl/10.2.0/include/stdbool.h \
+ ../include/diagnostics.h \
+ /home/stu/riscv64--musl--bleeding-edge-2020.08-1/lib/gcc/riscv64-buildroot-linux-musl/10.2.0/include/stdarg.h \
+ /home/stu/riscv64--musl--bleeding-edge-2020.08-1/riscv64-buildroot-linux-musl/sysroot/usr/include/sys/stat.h \
+ /home/stu/riscv64--musl--bleeding-edge-2020.08-1/riscv64-buildroot-linux-musl/sysroot/usr/include/bits/stat.h \
+ /home/stu/riscv64--musl--bleeding-edge-2020.08-1/riscv64-buildroot-linux-musl/sysroot/usr/include/inttypes.h \
+ /home/stu/riscv64--musl--bleeding-edge-2020.08-1/riscv64-buildroot-linux-musl/sysroot/usr/include/errno.h \
+ /home/stu/riscv64--musl--bleeding-edge-2020.08-1/riscv64-buildroot-linux-musl/sysroot/usr/include/bits/errno.h \
+ opintl.h \
+ /home/stu/riscv64--musl--bleeding-edge-2020.08-1/riscv64-buildroot-linux-musl/sysroot/usr/include/libintl.h
+/home/stu/riscv64--musl--bleeding-edge-2020.08-1/riscv64-buildroot-linux-musl/sysroot/usr/include/stdc-predef.h:
+sysdep.h:
+config.h:
+/home/stu/riscv64--musl--bleeding-edge-2020.08-1/riscv64-buildroot-linux-musl/sysroot/usr/include/stdlib.h:
+/home/stu/riscv64--musl--bleeding-edge-2020.08-1/riscv64-buildroot-linux-musl/sysroot/usr/include/features.h:
+/home/stu/riscv64--musl--bleeding-edge-2020.08-1/riscv64-buildroot-linux-musl/sysroot/usr/include/bits/alltypes.h:
+/home/stu/riscv64--musl--bleeding-edge-2020.08-1/riscv64-buildroot-linux-musl/sysroot/usr/include/alloca.h:
+/home/stu/riscv64--musl--bleeding-edge-2020.08-1/riscv64-buildroot-linux-musl/sysroot/usr/include/string.h:
+/home/stu/riscv64--musl--bleeding-edge-2020.08-1/riscv64-buildroot-linux-musl/sysroot/usr/include/strings.h:
+../include/ansidecl.h:
+../include/dis-asm.h:
+/home/stu/riscv64--musl--bleeding-edge-2020.08-1/riscv64-buildroot-linux-musl/sysroot/usr/include/stdio.h:
+../bfd/bfd.h:
+../include/symcat.h:
+/home/stu/riscv64--musl--bleeding-edge-2020.08-1/lib/gcc/riscv64-buildroot-linux-musl/10.2.0/include/stdint.h:
+/home/stu/riscv64--musl--bleeding-edge-2020.08-1/riscv64-buildroot-linux-musl/sysroot/usr/include/stdint.h:
+/home/stu/riscv64--musl--bleeding-edge-2020.08-1/riscv64-buildroot-linux-musl/sysroot/usr/include/bits/stdint.h:
+/home/stu/riscv64--musl--bleeding-edge-2020.08-1/lib/gcc/riscv64-buildroot-linux-musl/10.2.0/include/stdbool.h:
+../include/diagnostics.h:
+/home/stu/riscv64--musl--bleeding-edge-2020.08-1/lib/gcc/riscv64-buildroot-linux-musl/10.2.0/include/stdarg.h:
+/home/stu/riscv64--musl--bleeding-edge-2020.08-1/riscv64-buildroot-linux-musl/sysroot/usr/include/sys/stat.h:
+/home/stu/riscv64--musl--bleeding-edge-2020.08-1/riscv64-buildroot-linux-musl/sysroot/usr/include/bits/stat.h:
+/home/stu/riscv64--musl--bleeding-edge-2020.08-1/riscv64-buildroot-linux-musl/sysroot/usr/include/inttypes.h:
+/home/stu/riscv64--musl--bleeding-edge-2020.08-1/riscv64-buildroot-linux-musl/sysroot/usr/include/errno.h:
+/home/stu/riscv64--musl--bleeding-edge-2020.08-1/riscv64-buildroot-linux-musl/sysroot/usr/include/bits/errno.h:
+opintl.h:
+/home/stu/riscv64--musl--bleeding-edge-2020.08-1/riscv64-buildroot-linux-musl/sysroot/usr/include/libintl.h:

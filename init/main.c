@@ -36,7 +36,6 @@
 #include <os/socket.h>
 #include <os/smp.h>
 #include <os/io.h>
-#include <sys/special_ctx.h>
 #include <fs/poll.h>
 #include <fs/pipe.h>
 // #include <csr.h>
@@ -138,7 +137,7 @@ static void init_syscall(void)
     syscall[SYS_disk_write]             = (long int (*)())&disk_write;
     syscall[SYS_disk_read]              = (long int (*)())&disk_read;
     syscall[SYS_preload]                = (long int (*)())&do_pre_load;
-    syscall[SYS_extend]                 = (long int (*)())&do_extend;
+
 // =========== for the k210===================
     /* id */
     syscall[SYS_getpid]              = (long int (*)())&do_getpid; 
@@ -161,8 +160,6 @@ static void init_syscall(void)
 
     /* mm */
     syscall[SYS_brk]                 = (long int (*)())&do_brk;
-    // syscall[SYS_brk]                 = (long int (*)())&lazy_brk;
-
 
     /* fat32 */
     /* open close */

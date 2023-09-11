@@ -1,16 +1,13 @@
 #include <os/syscall.h>
 #include <os/irq.h>
 #include <os/stdio.h>
-#include <os/sched.h>
 long (*syscall[NUM_SYSCALLS])();
-
 
 void handle_syscall(regs_context_t *regs, uint64_t interrupt, uint64_t cause)
 {
     regs->sepc = regs->sepc + 4;
     if (syscall[regs->regs[17]] == handle_miss)
         handle_miss(regs, interrupt, cause);
-
     // debug_info(regs, interrupt, cause);
     regs->regs[10] = syscall[regs->regs[17]](regs->regs[10],
                                               regs->regs[11],

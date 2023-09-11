@@ -127,7 +127,7 @@ static inline uint64_t get_pgdir()
 
 #ifndef k210
     #define KERNEL_ENTRYPOINT 0xffffffc080220000lu
-    #define KERNEL_END 0xffffffc080a20000lu
+    #define KERNEL_END 0xffffffc081220000lu
 #else
     #define KERNEL_ENTRYPOINT 0xffffffc080040000lu
     #define KERNEL_END 0xffffffc080800000lu
@@ -145,9 +145,8 @@ static inline uint64_t get_pgdir()
 #define BOOT_KERNEL_END (KERNEL_END & 0xfffffffflu)
 
 // for qemu disk
-#define QEMU_DISK_OFFSET (START_ENTRYPOINT + (64*1024*1024))
-#define QEMU_DISK_END (QEMU_DISK_OFFSET + (64*1024*1024))
-#define SWAP_QEMU_DISK (QEMU_DISK_OFFSET + (38*1024*1024))
+#define QEMU_DISK_OFFSET (START_ENTRYPOINT + (128*1024*1024))
+#define QEMU_DISK_END (QEMU_DISK_OFFSET + (256*1024*1024))
 
 /*
  * PTE format:
@@ -347,33 +346,6 @@ static inline void set_attribute(PTE *entry, uint64_t bits)
      * set flag
      */
     *entry &= ((uint64_t)(~0) << 10);
-    *entry |= bits;
-}
-
-/* check flag  */
-static inline uint32_t check_attribute(PTE *entry, uint64_t bits)
-{
-    /**
-     * check flag
-     */
-    return (*entry & bits) != 0;
-}
-
-/* check flag  */
-static inline void clear_attribute(PTE *entry, uint64_t bits)
-{
-    /**
-     * check flag
-     */
-    *entry &= ~(bits);
-}
-
-/* check flag  */
-static inline void add_attribute(PTE *entry, uint64_t bits)
-{
-    /**
-     * check flag
-     */
     *entry |= bits;
 }
 

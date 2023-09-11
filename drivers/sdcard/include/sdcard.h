@@ -89,9 +89,6 @@ uint8_t disk_read(uint8_t *data_buff, uint32_t sector, uint32_t count);
 uint8_t disk_write(uint8_t *data_buff, uint32_t sector, uint32_t count);
 uint8_t disk_read_bio(struct buf *a, uint32_t num);
 uint8_t disk_write_bio(struct buf *a, uint32_t num);
-uint8_t disk_read_swap(uint8_t *data_buff, uint32_t sector, uint32_t count);
-uint8_t disk_write_swap(uint8_t *data_buff, uint32_t sector, uint32_t count);
-
 // void disk_intr();
 #ifdef __cplusplus
 }

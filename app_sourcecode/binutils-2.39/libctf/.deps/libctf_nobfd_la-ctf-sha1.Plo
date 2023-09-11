@@ -1,0 +1,99 @@
+libctf_nobfd_la-ctf-sha1.lo: ctf-sha1.c \
+ /home/stu/riscv64--musl--bleeding-edge-2020.08-1/riscv64-buildroot-linux-musl/sysroot/usr/include/stdc-predef.h \
+ ctf-impl.h config.h \
+ /home/stu/riscv64--musl--bleeding-edge-2020.08-1/riscv64-buildroot-linux-musl/sysroot/usr/include/errno.h \
+ /home/stu/riscv64--musl--bleeding-edge-2020.08-1/riscv64-buildroot-linux-musl/sysroot/usr/include/features.h \
+ /home/stu/riscv64--musl--bleeding-edge-2020.08-1/riscv64-buildroot-linux-musl/sysroot/usr/include/bits/errno.h \
+ /home/stu/riscv64--musl--bleeding-edge-2020.08-1/riscv64-buildroot-linux-musl/sysroot/usr/include/sys/param.h \
+ /home/stu/riscv64--musl--bleeding-edge-2020.08-1/riscv64-buildroot-linux-musl/sysroot/usr/include/sys/resource.h \
+ /home/stu/riscv64--musl--bleeding-edge-2020.08-1/riscv64-buildroot-linux-musl/sysroot/usr/include/sys/time.h \
+ /home/stu/riscv64--musl--bleeding-edge-2020.08-1/riscv64-buildroot-linux-musl/sysroot/usr/include/sys/select.h \
+ /home/stu/riscv64--musl--bleeding-edge-2020.08-1/riscv64-buildroot-linux-musl/sysroot/usr/include/bits/alltypes.h \
+ /home/stu/riscv64--musl--bleeding-edge-2020.08-1/riscv64-buildroot-linux-musl/sysroot/usr/include/bits/resource.h \
+ /home/stu/riscv64--musl--bleeding-edge-2020.08-1/riscv64-buildroot-linux-musl/sysroot/usr/include/endian.h \
+ /home/stu/riscv64--musl--bleeding-edge-2020.08-1/riscv64-buildroot-linux-musl/sysroot/usr/include/limits.h \
+ /home/stu/riscv64--musl--bleeding-edge-2020.08-1/riscv64-buildroot-linux-musl/sysroot/usr/include/bits/limits.h \
+ ctf-decls.h \
+ /home/stu/riscv64--musl--bleeding-edge-2020.08-1/lib/gcc/riscv64-buildroot-linux-musl/10.2.0/include/stddef.h \
+ /home/stu/riscv64--musl--bleeding-edge-2020.08-1/riscv64-buildroot-linux-musl/sysroot/usr/include/stdlib.h \
+ /home/stu/riscv64--musl--bleeding-edge-2020.08-1/riscv64-buildroot-linux-musl/sysroot/usr/include/alloca.h \
+ ../include/libiberty.h ../include/ansidecl.h \
+ /home/stu/riscv64--musl--bleeding-edge-2020.08-1/lib/gcc/riscv64-buildroot-linux-musl/10.2.0/include/stdarg.h \
+ /home/stu/riscv64--musl--bleeding-edge-2020.08-1/riscv64-buildroot-linux-musl/sysroot/usr/include/stdio.h \
+ ../include/ctf-api.h \
+ /home/stu/riscv64--musl--bleeding-edge-2020.08-1/riscv64-buildroot-linux-musl/sysroot/usr/include/sys/types.h \
+ ../include/ctf.h \
+ /home/stu/riscv64--musl--bleeding-edge-2020.08-1/lib/gcc/riscv64-buildroot-linux-musl/10.2.0/include/stdint.h \
+ /home/stu/riscv64--musl--bleeding-edge-2020.08-1/riscv64-buildroot-linux-musl/sysroot/usr/include/stdint.h \
+ /home/stu/riscv64--musl--bleeding-edge-2020.08-1/riscv64-buildroot-linux-musl/sysroot/usr/include/bits/stdint.h \
+ ../zlib/zlib.h ../zlib/zconf.h \
+ /home/stu/riscv64--musl--bleeding-edge-2020.08-1/riscv64-buildroot-linux-musl/sysroot/usr/include/unistd.h \
+ /home/stu/riscv64--musl--bleeding-edge-2020.08-1/riscv64-buildroot-linux-musl/sysroot/usr/include/bits/posix.h \
+ ctf-sha1.h ../include/sha1.h \
+ /home/stu/riscv64--musl--bleeding-edge-2020.08-1/riscv64-buildroot-linux-musl/sysroot/usr/include/string.h \
+ /home/stu/riscv64--musl--bleeding-edge-2020.08-1/riscv64-buildroot-linux-musl/sysroot/usr/include/strings.h \
+ /home/stu/riscv64--musl--bleeding-edge-2020.08-1/riscv64-buildroot-linux-musl/sysroot/usr/include/ctype.h \
+ elf.h ../include/ansidecl.h ../include/elf/common.h \
+ ../include/elf/external.h ../bfd/bfd.h ../include/symcat.h \
+ /home/stu/riscv64--musl--bleeding-edge-2020.08-1/lib/gcc/riscv64-buildroot-linux-musl/10.2.0/include/stdbool.h \
+ ../include/diagnostics.h \
+ /home/stu/riscv64--musl--bleeding-edge-2020.08-1/riscv64-buildroot-linux-musl/sysroot/usr/include/sys/stat.h \
+ /home/stu/riscv64--musl--bleeding-edge-2020.08-1/riscv64-buildroot-linux-musl/sysroot/usr/include/bits/stat.h \
+ /home/stu/riscv64--musl--bleeding-edge-2020.08-1/riscv64-buildroot-linux-musl/sysroot/usr/include/inttypes.h \
+ ../include/hashtab.h ctf-intl.h \
+ /home/stu/riscv64--musl--bleeding-edge-2020.08-1/riscv64-buildroot-linux-musl/sysroot/usr/include/libintl.h \
+ ctf-inlines.h ctf-sha1.h
+/home/stu/riscv64--musl--bleeding-edge-2020.08-1/riscv64-buildroot-linux-musl/sysroot/usr/include/stdc-predef.h:
+ctf-impl.h:
+config.h:
+/home/stu/riscv64--musl--bleeding-edge-2020.08-1/riscv64-buildroot-linux-musl/sysroot/usr/include/errno.h:
+/home/stu/riscv64--musl--bleeding-edge-2020.08-1/riscv64-buildroot-linux-musl/sysroot/usr/include/features.h:
+/home/stu/riscv64--musl--bleeding-edge-2020.08-1/riscv64-buildroot-linux-musl/sysroot/usr/include/bits/errno.h:
+/home/stu/riscv64--musl--bleeding-edge-2020.08-1/riscv64-buildroot-linux-musl/sysroot/usr/include/sys/param.h:
+/home/stu/riscv64--musl--bleeding-edge-2020.08-1/riscv64-buildroot-linux-musl/sysroot/usr/include/sys/resource.h:
+/home/stu/riscv64--musl--bleeding-edge-2020.08-1/riscv64-buildroot-linux-musl/sysroot/usr/include/sys/time.h:
+/home/stu/riscv64--musl--bleeding-edge-2020.08-1/riscv64-buildroot-linux-musl/sysroot/usr/include/sys/select.h:
+/home/stu/riscv64--musl--bleeding-edge-2020.08-1/riscv64-buildroot-linux-musl/sysroot/usr/include/bits/alltypes.h:
+/home/stu/riscv64--musl--bleeding-edge-2020.08-1/riscv64-buildroot-linux-musl/sysroot/usr/include/bits/resource.h:
+/home/stu/riscv64--musl--bleeding-edge-2020.08-1/riscv64-buildroot-linux-musl/sysroot/usr/include/endian.h:
+/home/stu/riscv64--musl--bleeding-edge-2020.08-1/riscv64-buildroot-linux-musl/sysroot/usr/include/limits.h:
+/home/stu/riscv64--musl--bleeding-edge-2020.08-1/riscv64-buildroot-linux-musl/sysroot/usr/include/bits/limits.h:
+ctf-decls.h:
+/home/stu/riscv64--musl--bleeding-edge-2020.08-1/lib/gcc/riscv64-buildroot-linux-musl/10.2.0/include/stddef.h:
+/home/stu/riscv64--musl--bleeding-edge-2020.08-1/riscv64-buildroot-linux-musl/sysroot/usr/include/stdlib.h:
+/home/stu/riscv64--musl--bleeding-edge-2020.08-1/riscv64-buildroot-linux-musl/sysroot/usr/include/alloca.h:
+../include/libiberty.h:
+../include/ansidecl.h:
+/home/stu/riscv64--musl--bleeding-edge-2020.08-1/lib/gcc/riscv64-buildroot-linux-musl/10.2.0/include/stdarg.h:
+/home/stu/riscv64--musl--bleeding-edge-2020.08-1/riscv64-buildroot-linux-musl/sysroot/usr/include/stdio.h:
+../include/ctf-api.h:
+/home/stu/riscv64--musl--bleeding-edge-2020.08-1/riscv64-buildroot-linux-musl/sysroot/usr/include/sys/types.h:
+../include/ctf.h:
+/home/stu/riscv64--musl--bleeding-edge-2020.08-1/lib/gcc/riscv64-buildroot-linux-musl/10.2.0/include/stdint.h:
+/home/stu/riscv64--musl--bleeding-edge-2020.08-1/riscv64-buildroot-linux-musl/sysroot/usr/include/stdint.h:
+/home/stu/riscv64--musl--bleeding-edge-2020.08-1/riscv64-buildroot-linux-musl/sysroot/usr/include/bits/stdint.h:
+../zlib/zlib.h:
+../zlib/zconf.h:
+/home/stu/riscv64--musl--bleeding-edge-2020.08-1/riscv64-buildroot-linux-musl/sysroot/usr/include/unistd.h:
+/home/stu/riscv64--musl--bleeding-edge-2020.08-1/riscv64-buildroot-linux-musl/sysroot/usr/include/bits/posix.h:
+ctf-sha1.h:
+../include/sha1.h:
+/home/stu/riscv64--musl--bleeding-edge-2020.08-1/riscv64-buildroot-linux-musl/sysroot/usr/include/string.h:
+/home/stu/riscv64--musl--bleeding-edge-2020.08-1/riscv64-buildroot-linux-musl/sysroot/usr/include/strings.h:
+/home/stu/riscv64--musl--bleeding-edge-2020.08-1/riscv64-buildroot-linux-musl/sysroot/usr/include/ctype.h:
+elf.h:
+../include/ansidecl.h:
+../include/elf/common.h:
+../include/elf/external.h:
+../bfd/bfd.h:
+../include/symcat.h:
+/home/stu/riscv64--musl--bleeding-edge-2020.08-1/lib/gcc/riscv64-buildroot-linux-musl/10.2.0/include/stdbool.h:
+../include/diagnostics.h:
+/home/stu/riscv64--musl--bleeding-edge-2020.08-1/riscv64-buildroot-linux-musl/sysroot/usr/include/sys/stat.h:
+/home/stu/riscv64--musl--bleeding-edge-2020.08-1/riscv64-buildroot-linux-musl/sysroot/usr/include/bits/stat.h:
+/home/stu/riscv64--musl--bleeding-edge-2020.08-1/riscv64-buildroot-linux-musl/sysroot/usr/include/inttypes.h:
+../include/hashtab.h:
+ctf-intl.h:
+/home/stu/riscv64--musl--bleeding-edge-2020.08-1/riscv64-buildroot-linux-musl/sysroot/usr/include/libintl.h:
+ctf-inlines.h:
+ctf-sha1.h:

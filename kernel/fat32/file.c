@@ -3,7 +3,7 @@
 #include <os/sched.h>
 #include <fs/pipe.h>
 
-pfd_table_t pfd_table[MAX_FD_TABLE];
+pfd_table_t pfd_table[NUM_MAX_TASK];
 
 /**
  * @brief 初始化所有的文件描述符，归内核进行管理，以链表的方式进行管理
@@ -108,7 +108,7 @@ int32_t get_fd_index_without_redirect(fd_num_t fd, void * pcb)
 // }
 
 void init_fd_table(){
-    for (int i = 0; i < MAX_FD_TABLE; i++)
+    for (int i = 0; i < NUM_MAX_TASK; i++)
     {
         pfd_table[i].num = 0;
         pfd_table[i].used = 0;
@@ -121,7 +121,7 @@ void init_fd_table(){
  * 
  */
 fd_t *alloc_fd_table(){
-    for (int i = 0; i < MAX_FD_TABLE; i++)
+    for (int i = 0; i < NUM_MAX_TASK; i++)
     {
         if(pfd_table[i].used == 0){
             // printk("get: %d\n", i);
@@ -166,7 +166,7 @@ void free_fd_table(fd_t* pfd_in){
 }
 
 void update_fd_length(fd_t *src_pfd){
-    for (int i = 0;i < MAX_FD_TABLE; i++){
+    for (int i = 0;i < NUM_MAX_TASK; i++){
         if (pfd_table[i].used)
             for (int j=0; j<MAX_FILE_NUM; j++){
                 if ((pfd_table[i].pfd[j].used) && (&(pfd_table[i].pfd[j]) != src_pfd) &&

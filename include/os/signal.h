@@ -8,12 +8,11 @@
 #define SIG_BLOCK 0x0
 #define SIG_UNBLOCK 0x1
 #define SIG_SETMASK 0x2
-#define MAX_SIGNAL_NUM 100
 
 /* size of sigset_t */
 #define _NSIG_WORDS 1
 
-#define NUM_SIG 33
+#define NUM_SIG 64
 
 
 /* signal */

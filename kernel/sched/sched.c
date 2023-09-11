@@ -7,7 +7,6 @@
 #include <os/irq.h>
 #include <os/spinlock.h>
 #include <os/string.h>
-#include <swap/swap.h>
 #include <fs/fat32.h>
 #include <stdio.h>
 #include <assert.h>
@@ -56,10 +55,6 @@ LIST_HEAD(zombie_queue);
 LIST_HEAD(used_queue)
 // available pcb queue
 source_manager_t available_queue;
-
-// for special
-char test_name[50] = {0};
-int record = 0;
 
 /* current running task PCB */
 // pcb_t * volatile current_running;
@@ -156,8 +151,6 @@ void do_priori(int priori, int pcb_id){
 
 void do_block(list_node_t *pcb_node, list_head *queue)
 {
-    // if the process was killed, should kill 
-    handle_signal();
     // TODO: block the pcb task into the block queue
     pcb_t * current_running = get_current_running();
     // printk("block pid:%d\n", current_running->pid);
@@ -197,11 +190,9 @@ pid_t do_exec(const char *file_name, int argc, char* argv[], spawn_mode_t mode){
     // printk("enter do_exec\n");
     // we will always get one pcb
     // printk("[exec] %s\n", file_name);
-    printk("I have %d pages\n", freePageManager.source_num);
     pcb_t *initpcb = get_free_pcb();
     pcb_t *current_running = get_current_running();
-    if (argc >= 2)
-        kstrcpy(test_name, argv[1]);
+    
     // init the pcb 
     initpcb->pgdir = allocPage() - PAGE_SIZE;   
     initpcb->kernel_stack_top = allocPage();         //a kernel virtual addr, has been mapped
@@ -225,12 +216,16 @@ pid_t do_exec(const char *file_name, int argc, char* argv[], spawn_mode_t mode){
     // load process into memory
     ptr_t entry_point = load_process_memory(file_name, initpcb);
 
-    // dynamic
-    if (initpcb->exe_load->dynamic)
-    {
-        entry_point = load_connector("libc.so", initpcb->pgdir);
-    }
-
+    #ifdef FAST
+        if (initpcb->exe_load->dynamic)
+        {
+            entry_point = load_connector("libc.so", initpcb->pgdir);
+        }
+    #else
+        if(initpcb->dynamic){
+            entry_point = load_connector("libc.so", initpcb->pgdir);
+        }    
+    #endif
     if (entry_point == 0)
     {
         printk("[Error] load %3s to memory false\n", file_name);
@@ -244,7 +239,6 @@ pid_t do_exec(const char *file_name, int argc, char* argv[], spawn_mode_t mode){
     initpcb->user_sp = copy_thing_user_stack(initpcb, initpcb->user_stack_top, true_argc, \
                         argv, fixed_envp, file_name);
 
-    initpcb->user_stack_top = initpcb->user_sp;
     // init all stack
     init_pcb_stack(initpcb->kernel_sp, initpcb->user_sp, entry_point, initpcb, \
                     true_argc, argv);
@@ -269,7 +263,6 @@ pid_t do_execve(const char* path, char* argv[], char *const envp[]){
     uintptr_t pre_pgdir = initpcb->pgdir;
     // a new pgdir
     initpcb->pgdir = allocPage() - PAGE_SIZE; 
-    uint64_t pre_edata = initpcb->edata;
 
     initpcb->user_stack_top = USER_STACK_ADDR;       //a user virtual addr, not mapped
     initpcb->kernel_sp =initpcb->kernel_stack_top;
@@ -281,9 +274,9 @@ pid_t do_execve(const char* path, char* argv[], char *const envp[]){
     {
         alloc_page_helper(initpcb->user_stack_top - (i + 1) * PAGE_SIZE, initpcb->pgdir, MAP_USER);
     }
-    
-    excellent_load_t *pre_exe_load = initpcb->exe_load;
-
+    #ifdef FAST
+        excellent_load_t *pre_exe_load = initpcb->exe_load;
+    #endif
     /* handle ./xxx */
     for (int i = 0; i < kstrlen(path); i++){
         if(path[i] == '/'){
@@ -310,18 +303,22 @@ pid_t do_execve(const char* path, char* argv[], char *const envp[]){
     }
 
     // dynamic
-    if (initpcb->exe_load->dynamic)
-    {
-        entry_point = load_connector("libc.so", initpcb->pgdir);
-    }
-
+    #ifdef FAST
+        if (initpcb->exe_load->dynamic)
+        {
+            entry_point = load_connector("libc.so", initpcb->pgdir);
+        }
+    #else
+        if(initpcb->dynamic){
+            entry_point = load_connector("libc.so", initpcb->pgdir);
+        }    
+    #endif
     int argc = (int)get_num_from_parm(argv);
 
     // copya all things on the user stack
     initpcb->user_sp = copy_thing_user_stack(initpcb, initpcb->user_stack_top, argc, \
                         argv, envp, path);
 
-    initpcb->user_stack_top = initpcb->user_sp;
     uint64_t save_core_id = get_current_cpu_id();
     // initialize process
     init_pcb_stack(initpcb->kernel_sp, initpcb->user_sp, entry_point, \
@@ -331,7 +328,7 @@ pid_t do_execve(const char* path, char* argv[], char *const envp[]){
     // add in the ready_queue
     list_add(&initpcb->list, &ready_queue);
     #ifdef FAST
-        recycle_page_part(pre_pgdir, pre_exe_load, pre_edata);
+        recycle_page_part(pre_pgdir, pre_exe_load);
     #else
         recycle_page_voilent(pre_pgdir);
     #endif
@@ -482,20 +479,6 @@ pid_t do_clone(uint32_t flag, uint64_t stack, pid_t ptid, void *tls, pid_t ctid)
         {
             /* code */
             uintptr_t cloneu_base = alloc_page_helper(u_base, initpcb->pgdir, MAP_USER);
-
-            if (status_ctx)
-            {
-                PTE * pte = get_PTE_of(u_base, current_running->pgdir);
-                page_node_t * stack_page = &pageRecyc[GET_MEM_NODE(cloneu_base)];
-                if (*pte & _PAGE_SD)
-                {
-                    *stack_page->page_pte = *pte;
-                    // recyle it !
-                    kfree_voilence(cloneu_base);
-                    continue;
-                }
-            }
-
             share_pgtable(cloneu_base, ku_base);
         }
     // #endif    
@@ -511,8 +494,7 @@ pid_t do_clone(uint32_t flag, uint64_t stack, pid_t ptid, void *tls, pid_t ctid)
 
     // init clone satck
     init_clone_stack(initpcb, tls);
-    initpcb->user_stack_top = current_running->user_stack_top;
-    
+
     list_add(&initpcb->list, &ready_queue);
     // printk("clone end\n");
     return initpcb->pid;

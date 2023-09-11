@@ -128,10 +128,7 @@ SRC_FAT32   = ./kernel/fat32/fat32.c \
 			  ./kernel/fat32/poll.c
 
 SRC_UTILS   = ./kernel/utils/utils.c \
-			  ./kernel/utils/special_ctx.c \
 			  ./kernel/fat32/file.c
-
-SRC_SWAP    = ./kernel/swap/swap.c
 
 SRC_MAIN	= ${SRC_ARCH} \
 			  ${SRC_INIT} \
@@ -147,8 +144,7 @@ SRC_MAIN	= ${SRC_ARCH} \
 			  ${SRC_SYSTEM} \
 			  ${SRC_ELF} \
 			  ${SRC_UTILS} \
-			  ${SRC_FAT32} \
-			  ${SRC_SWAP}
+			  ${SRC_FAT32}
 			
 # make tools
 SRC_IMAGE	    = ./tools/createimage.c

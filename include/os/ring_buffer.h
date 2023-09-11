@@ -9,15 +9,14 @@
 #include <os/string.h>
 #include <type.h>
 
-#define RING_BUFFER_SIZE 4095
+#define RING_BUFFER_SIZE 4096
 #pragma pack(8)
 struct ring_buffer {
 	mutex_lock_t lock; /* FOR NOW no use */
 	size_t size;		// for future use
 	int32_t head;		// read from head
 	int32_t tail;		// write from tail
-	// char buf[RING_BUFFER_SIZE + 1]; // left 1 byte
-	char * buf;
+	char buf[RING_BUFFER_SIZE+1]; // left 1 byte
 };
 #pragma pack()
 
@@ -27,10 +26,10 @@ int wait_ring_buffer_write(struct ring_buffer *rbuf, time_t final_ticks);
 static inline void init_ring_buffer(struct ring_buffer *rbuf)
 {
 	// there is always one byte which should not be read or written
-	kmemset(rbuf, 0, sizeof(struct ring_buffer)); /* head = tail = 0 */
+	//kmemset(rbuf, 0, sizeof(struct ring_buffer)); /* head = tail = 0 */
+	rbuf->head = 0;
+	rbuf->tail = 0;
 	rbuf->size = RING_BUFFER_SIZE;
-	// WH ADD
-	// rbuf->buf = kmalloc(PAGE_SIZE);
 	do_mutex_lock_init(&rbuf->lock);
 	return ;
 }

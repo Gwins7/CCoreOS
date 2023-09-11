@@ -13,10 +13,9 @@
 // * Only one process at a time can use a buffer,
 //     so do not keep them longer than necessary.
 
-#include <type.h>
+#include "type.h"
 #include "stdio.h"
 #include "os/list.h"
-#include <os/mm.h>
 #include "include/param.h"
 #include "include/buf.h"
 #include "include/sdcard.h"
@@ -76,7 +75,6 @@ static struct buf *bufs;
 static int actual_buf_num;
 // wait queue
 static sleeplist_t nwait_sleep_queue;
-LIST_HEAD(bioPageList);
 void 
 binit(void)
 {
@@ -86,14 +84,8 @@ binit(void)
 	actual_buf_num = ROUND(sizeof(struct buf) * BNUM,NORMAL_PAGE_SIZE) / sizeof(struct buf);
 	printk("> [binit] actual_buf_num = %d\n",actual_buf_num);
 	bufs = kmalloc(NORMAL_PAGE_SIZE);
-	list_move(&pageRecyc[GET_MEM_NODE((uint64_t)bufs)].list, &bioPageList);
 	int actual_buf_remain = ROUND(sizeof(struct buf) * BNUM,NORMAL_PAGE_SIZE) - NORMAL_PAGE_SIZE;
-	for (;actual_buf_remain!=0;actual_buf_remain-=NORMAL_PAGE_SIZE) 
-	{
-		uint64_t kva =  kmalloc(NORMAL_PAGE_SIZE); //we assume that the memspace allocated here is coherent 
-		list_move(&pageRecyc[GET_MEM_NODE((uint64_t)kva)].list, &bioPageList);
-	}
-	
+	for (;actual_buf_remain!=0;actual_buf_remain-=NORMAL_PAGE_SIZE) kmalloc(NORMAL_PAGE_SIZE); //we assume that the memspace allocated here is coherent 
 	for (int i = 0; i < BCACHE_TABLE_SIZE; i++)
 		init_list(&bcache[i]);
 	for (struct buf *b = bufs; b < bufs + actual_buf_num; b++) {

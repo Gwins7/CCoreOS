@@ -1,0 +1,1 @@
+eelf64briscv_lp64.c: ./emulparams/elf64briscv_lp64.sh ./emulparams/elf64lriscv_lp64.sh ./emulparams/elf64lriscv-defs.sh ./emulparams/elf32lriscv-defs.sh ./scripttempl/elf.sc ./emultempl/elf.em ./emultempl/elf-generic.em ./emultempl/riscvelf.em ./emultempl/emulation.em

@@ -1,6 +1,5 @@
 #include <fs/fat32.h>
 #include <fs/pipe.h>
-#include <sys/special_ctx.h>
 #include <os/sched.h>
 #include <stdio.h>
 
@@ -102,11 +101,6 @@ int32_t close_pipe_read(uint32_t pip_num){
     }
     else {
         pipe[pip_num].r_valid--;
-        if (!pipe[pip_num].r_valid && !pipe[pip_num].w_valid)
-        {
-            kfree(pipe[pip_num].rbuf.buf);
-            pipe[pip_num].rbuf.buf = NULL;
-        }
         //do_mutex_lock_release(&pipe[pip_num].lock);
         return 0;
     }
@@ -125,11 +119,6 @@ int32_t close_pipe_write(uint32_t pip_num){
     }
     else {
         pipe[pip_num].w_valid--;
-        if (!pipe[pip_num].r_valid && !pipe[pip_num].w_valid)
-        {
-            kfree(pipe[pip_num].rbuf.buf);
-            pipe[pip_num].rbuf.buf = NULL;
-        }
         //do_mutex_lock_release(&pipe[pip_num].lock);
         return 0;
     }
@@ -148,8 +137,6 @@ int32_t alloc_one_pipe()
         pipe[i].r_valid = 1;
         pipe[i].w_valid = 1;
         pipe[i].pid = current_running->pid;
-        init_ring_buffer(&pipe[i].rbuf);
-        pipe[i].rbuf.buf = kmalloc(PAGE_SIZE);
         pipenum = i;
         break;
         }
@@ -173,9 +160,8 @@ int32_t fat32_pipe2(uint32_t *fd){
          if (!pipe[i].r_valid && !pipe[i].w_valid) {
             pipe[i].r_valid = 1;
             pipe[i].w_valid = 1;
-            pipe[i].pid = current_running->pid;
             init_ring_buffer(&pipe[i].rbuf);
-            pipe[i].rbuf.buf = kmalloc(PAGE_SIZE);
+            pipe[i].pid = current_running->pid;
             pipenum = i;
             //do_mutex_lock_release(&pipe[i].lock);
             break;
@@ -183,38 +169,19 @@ int32_t fat32_pipe2(uint32_t *fd){
          //do_mutex_lock_release(&pipe[i].lock);
     }
     if (i==PIPE_NUM) return -ENFILE;
-    if (status_ctx)
-    {
-        // for special ctx
-        fd[0] = get_one_cpt(current_running);
-        ctx_pipe_t *fd_0 = &current_running->ctx_pipe_array[fd[0]];
-        fd_0->dev = DEV_PIPE;
-        fd_0->fd_num = pipenum;
-        fd_0->pipe_type = PIPE_READ;
-
-        fd[1] = get_one_cpt(current_running);
-        ctx_pipe_t *fd_1 = &current_running->ctx_pipe_array[fd[1]];
-        fd_1->dev = DEV_PIPE;
-        fd_1->fd_num = pipenum;
-        fd_1->pipe_type = PIPE_WRITE;
-
-    } else 
-    {
-        //alloc 2 fds
-        fd[0] = get_one_fd(current_running);
-        fd_t *fd_0 = &current_running->pfd[get_fd_index(fd[0], current_running)];
-        fd_0->dev = DEV_PIPE;
-        fd_0->pip_num = pipenum;
-        fd_0->is_pipe_read = 1;
-        fd_0->is_pipe_write = 0;
-        fd[1] = get_one_fd(current_running);
-        fd_t *fd_1 = &current_running->pfd[get_fd_index(fd[1], current_running)];
-        fd_1->dev = DEV_PIPE;
-        fd_1->pip_num = pipenum;
-        fd_1->is_pipe_read = 0;
-        fd_1->is_pipe_write = 1;        
-    }
-
+    //alloc 2 fds
+    fd[0] = get_one_fd(current_running);
+    fd_t *fd_0 = &current_running->pfd[get_fd_index(fd[0],current_running)];
+    fd_0->dev = DEV_PIPE;
+    fd_0->pip_num = pipenum;
+    fd_0->is_pipe_read = 1;
+    fd_0->is_pipe_write = 0;
+    fd[1] = get_one_fd(current_running);
+    fd_t *fd_1 = &current_running->pfd[get_fd_index(fd[1],current_running)];
+    fd_1->dev = DEV_PIPE;
+    fd_1->pip_num = pipenum;
+    fd_1->is_pipe_read = 0;
+    fd_1->is_pipe_write = 1;
     // init_share_fd(fd_0);
     // init_share_fd(fd_1);
     // printk("[pipe] alloc fd0: %d, fd1: %d\n", *fd, *(fd+1));

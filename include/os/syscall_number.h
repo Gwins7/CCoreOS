@@ -130,7 +130,6 @@
 #define SYS_disk_read           (251)
 #define SYS_disk_write          (252)
 #define SYS_preload             (253)
-#define SYS_extend              (254)
 
 #define SYS_wait4               (260) 
 #define SYS_prlimit             (261)

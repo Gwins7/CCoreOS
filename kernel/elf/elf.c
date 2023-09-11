@@ -219,6 +219,9 @@ uintptr_t fat32_load_elf(uint32_t fd, uintptr_t pgdir, uint64_t *file_length, vo
         fat32_read(fd, &phdr, sizeof(Elf64_Phdr));
         // debug_print_phdr(phdr);
         *file_length += phdr.p_memsz;
+        if (phdr.p_type == PT_DYNAMIC){
+            underinitpcb->dynamic = 1;
+        }
         if (phdr.p_type == PT_LOAD) {
             /* TODO: */
             // debug_print_phdr(phdr);

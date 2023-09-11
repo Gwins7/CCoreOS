@@ -42,9 +42,8 @@
 #include <os/signal.h>
 #include <os/resource.h>
 #include <user_programs.h>
-#include <sys/special_ctx.h>
 
-#define NUM_MAX_TASK 100
+#define NUM_MAX_TASK 35
 #define NUM_MAX_USTACK 2
 // #define PRIORITY
 #define NO_PRIORITY
@@ -162,9 +161,6 @@ typedef struct pcb
     uint32_t mask;
     /* rlimit */
     
-    // for the special pipe
-    ctx_pipe_t * ctx_pipe_array;
-
     /* priority */
     uint64_t priority;
 
@@ -176,10 +172,12 @@ typedef struct pcb
 
     /* the number of physic_page, no more than 3 */
     uint32_t pge_num;
-    #ifdef FAST
+    // #ifdef FAST
         /* for the fast load */ 
         excellent_load_t *exe_load;
-    #endif
+    // #else
+        int dynamic;
+    // #endif
     /* stand the execve */
     uint32_t execve;
 
@@ -244,9 +242,6 @@ extern list_head used_queue;
 
 /* avaliable pcb queue */
 extern source_manager_t available_queue;
-
-// special
-extern char test_name[50];
 
 /* smp */
 pcb_t * volatile current_running_master;

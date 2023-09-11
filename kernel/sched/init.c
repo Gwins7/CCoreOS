@@ -6,7 +6,6 @@
 #include <os/irq.h>
 #include <os/spinlock.h>
 #include <os/string.h>
-#include <sys/special_ctx.h>
 #include <fs/file.h>
 #include <os/futex.h>
 #include <screen.h>
@@ -179,14 +178,8 @@ void init_pcb_member(pcb_t * initpcb,  task_type_t type, spawn_mode_t mode)
     init_list(&initpcb->wait_list);
     
     // fd table
-    if (status_ctx)
-        init_extend_fd(initpcb->ctx_pipe_array);
-    else 
-    {
-        initpcb->pfd = alloc_fd_table();
-        init_fd(initpcb->pfd);        
-    }
-
+    initpcb->pfd = alloc_fd_table();
+    init_fd(initpcb->pfd);
     // set signal
     initpcb->sigactions = alloc_sig_table();
     initpcb->is_handle_signal = 0;
@@ -245,18 +238,12 @@ void init_clone_pcb(pcb_t * initpcb, task_type_t type, spawn_mode_t mode)
         pfd_table_t* pt =  list_entry(current_running->pfd, pfd_table_t, pfd);
         pt->num++;
     }else{
-        if (status_ctx)
+        initpcb->pfd = alloc_fd_table();
+        // init_fd(initpcb->pfd);
+        for (int i = 0; i < MAX_FD_NUM; i++)
         {
-            copy_extend_fd(initpcb->ctx_pipe_array, current_running->ctx_pipe_array);
-        } else 
-        {
-            initpcb->pfd = alloc_fd_table();
-            // init_fd(initpcb->pfd);
-            for (int i = 0; i < MAX_FD_NUM; i++)
-            {
-                /* code */
-                copy_fd(&initpcb->pfd[i], &current_running->pfd[i]);            
-            }            
+            /* code */
+            copy_fd(&initpcb->pfd[i], &current_running->pfd[i]);            
         }
     }    
 
@@ -332,6 +319,7 @@ void init_execve_pcb(pcb_t * initpcb, task_type_t type, spawn_mode_t mode)
  */
 int handle_exec_pipe_redirect(pcb_t *initpcb, pid_t *pipe_pid, int argc, char* argv[])
 {
+    if (argc == 1) return argc;
     pcb_t * current_running = get_current_running();
     int mid_argc;
     for (mid_argc = 0; mid_argc < argc && kstrcmp(argv[mid_argc],"|"); mid_argc++);
@@ -624,7 +612,7 @@ void handle_exit_pcb(pcb_t * exitPcb)
     #ifdef FAST
         int recycle_page_num;
         if (!(exitPcb->flag & CLONE_VM)) 
-            recycle_page_num = recycle_page_part(exitPcb->pgdir, exitPcb->exe_load, exitPcb->edata);
+            recycle_page_num = recycle_page_part(exitPcb->pgdir, exitPcb->exe_load);
     #else
         int recycle_page_num;
         if (!(exitPcb->flag & CLONE_VM)) 
@@ -687,8 +675,7 @@ int recycle_pcb_default(pcb_t * recyclePCB){
     recyclePCB->pge_num = 0;
 
     // free fd
-    if (!status_ctx)
-        free_fd_table(recyclePCB->pfd);
+    free_fd_table(recyclePCB->pfd);
     // free sig
     free_sig_table(recyclePCB->sigactions);
     // itimer

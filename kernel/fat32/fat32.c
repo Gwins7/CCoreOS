@@ -2,7 +2,6 @@
 #include <common.h>
 #include <os/sched.h>
 #include <utils/utils.h>
-#include <sys/special_ctx.h>
 #include <assert.h>
 #include <screen.h>
 #include <os/socket.h>
@@ -17,7 +16,7 @@ int fat32_init()
 {
     printk("> [FAT32 init] begin!\n");
     init_pipe();
-    uint8_t *b =  kmalloc(PAGE_SIZE);
+    uint8_t *b = kmalloc(PAGE_SIZE);
     //the DBR of SD card
     uint8_t result = sd_read_sector(b, FAT_FIRST_SEC, 1);
     if (result != 0x00) 
@@ -88,7 +87,7 @@ int fat32_init()
 int fat32_openat(fd_num_t fd, const uchar *path, uint32 flags, uint32 mode)
 {
     // printk("[openat] fd:%d, path: %s\n", fd, path);
-    // printk("[openat] try to open path %s, creat: %d\n",path,(flags & O_CREATE));
+    // printk("[openat] try to open path %s, creat: %d, mode: %d\n",path,(flags & O_CREATE), mode);
     pcb_t * current_running = get_current_running();
     uint32_t absolute_path = is_ab_path(path);
     /* find the pre clus */
@@ -214,26 +213,6 @@ int fat32_openat(fd_num_t fd, const uchar *path, uint32 flags, uint32 mode)
 int64 fat32_close(fd_num_t fd)
 {
     pcb_t *current_running = get_current_running();
-    // ==================== for the specical ctx ====================
-    if (status_ctx)
-    {
-        ctx_pipe_t * nfd = &current_running->ctx_pipe_array[fd];
-        if (nfd->dev != DEV_PIPE) 
-        {
-            if (nfd->fd_num < 3)
-                return 0;
-            else 
-                assert(0);
-        }
-        if (nfd->pipe_type == PIPE_READ) close_pipe_read(nfd->fd_num);
-        else if (nfd->pipe_type == PIPE_WRITE) close_pipe_write(nfd->fd_num);
-        nfd->used = FD_UNUSED;
-        nfd->dev = DEV_DEFAULT;
-        nfd->pipe_type = 0;
-        return 0;        
-    }
-    // ==================== for the specical ctx ====================
-
     int fd_index = get_fd_index_without_redirect(fd, current_running);
     if (fd_index < 0) return -EBADF;
     else {
@@ -286,10 +265,6 @@ int64 fat32_read(fd_num_t fd, uchar *buf, size_t count)
     
     // printk("[read] fd:%d,buf:%lx, count: %d(0x%x)\n", fd, buf,count, count);
     pcb_t *current_running = get_current_running();
-    // for special read
-    if (status_ctx) return read_cpt(&current_running->ctx_pipe_array[fd], buf, count);
-    
-    
     // get nfd now
     int fd_index = get_fd_index(fd, current_running);
     if (fd_index == -1) return -EBADF;
@@ -372,8 +347,6 @@ int64 fat32_write(fd_num_t fd, uchar *buf, uint64_t count)
     for (uint64_t i = (uint64_t)buf; i <= (uint64_t)buf + count; i+=PAGE_SIZE)
         handle_page_fault_store(NULL, i, NULL);
     pcb_t *current_running = get_current_running();    
-    // for special ctx
-    if (status_ctx) return write_cpt(&current_running->ctx_pipe_array[fd], buf, count);
     // get nfd now
     int fd_index = get_fd_index(fd, current_running);
     // printk("fd_index: %d\n", fd_index);
@@ -815,28 +788,8 @@ int fat32_link()
     return -EPERM;
 }
 
-int temp_file(char* path){
-    char name[15];
-    kmemcpy(name, path, 15);
-    name[13] = '\0';
-    if(!kstrcmp("/var/tmp/lat_", name)){
-        return 1;
-    }
-    name[4] = '\0';
-    if(!kstrcmp("lat_", name)){
-        return 1;
-    }
-    
-    if('0'<= name[0] && name[0]<= '9'){
-        return 1;
-    }
-    return 0;
-}
-
-
 int fat32_unlink(int dirfd, const char* path, uint32_t flags)
 {
-  
     pcb_t * current_running = get_current_running();
     uint8_t fd_index;
     char *buf =kmalloc(PAGE_SIZE);
@@ -884,7 +837,7 @@ int fat32_unlink(int dirfd, const char* path, uint32_t flags)
     // printk("dir.name:%s, dir.first clus: %d\n", dir.name, dir.first_clus);
     dentry_t* dentry = search2(dir.name, dir.first_clus, buf, mode, &pos);
     if(dentry == NULL){
-        printk("not find dir!\n");
+        // printk("not find dir!\n");
         kfree(buf);
         return -ENOENT;
     }
@@ -1113,14 +1066,19 @@ ssize_t fat32_pwrite(int fd, void * buf, size_t count, off_t offset){
 
 int32_t fat32_faccessat(fd_num_t dirfd, const char *pathname, 
                         int mode, int flags){
-    int32_t fd;
-    // for ls
-    if ((fd = fat32_openat(dirfd, pathname, flags, mode)) >= 0)
-    {
+    int m_exist = (mode == F_OK);
+    int m_read = (mode & R_OK) == R_OK;
+    int m_write = (mode & W_OK) == W_OK;
+    int m_exec = (mode & X_OK) == X_OK;
+    int fd;
+    if ((fd = fat32_openat(dirfd, pathname, O_DIRECTORY, mode)) >= 0){
+        fat32_close(fd);
+        return 0;
+    }else if ((fd = fat32_openat(dirfd, pathname, 0, mode)) >= 0){
         fat32_close(fd);
         return 0;
     }
-    else return fd;
+    return -1;
 }
 int32_t fat32_fsync(fd_num_t fd){
     bsync();
@@ -1129,7 +1087,7 @@ int32_t fat32_fsync(fd_num_t fd){
 size_t fat32_readlinkat(fd_num_t dirfd, const char *pathname, 
                         char *buf, size_t bufsiz){
     // printk("dirfd: %d; pathname: %s, buf:%lx\n", dirfd, pathname, buf);
-    char path[25] = "/lmbench_all";
+    char path[25] = "/rust";
     if (!kstrcmp(pathname, "/proc/self/exe")){
         kstrcpy(buf, path);
         return kstrlen(buf);
@@ -1214,7 +1172,7 @@ int fat32_renameat2(fd_num_t olddirfd, const char *oldpath_const, fd_num_t newdi
         old_dentry = search2(old_dir.name, old_dir.first_clus, old_buf, FILE_DIR, &old_pos);
     }
     if(old_dentry == NULL){
-        printk("not find dir!\n");
+        // printk("not find dir!\n");
         kfree(old_buf);
         return -ENOENT;
     }    

@@ -92,7 +92,7 @@ int recycle_page_voilent(uintptr_t pgdir){
  * @return the recycle page num
  * 
  */
-int recycle_page_part(uintptr_t pgdir, void *exe_load, uintptr_t edata)
+int recycle_page_part(uintptr_t pgdir, void *exe_load)
 {
     pcb_t* current_running = get_current_running();
     // printk("%s recycle\n", current_running->name);
@@ -141,11 +141,6 @@ int recycle_page_part(uintptr_t pgdir, void *exe_load, uintptr_t edata)
             {
                 if (!third_page[vpn0])
                     continue;
-                if ((third_page[vpn0] & _PAGE_PRESENT) == 0 || (third_page[vpn0] & _PAGE_SD) != 0)
-                {
-                    // printk("can't recycle\n")
-;                    continue;
-                }
                 uintptr_t final_page = pa2kva((get_pfn(third_page[vpn0]) << NORMAL_PAGE_SHIFT));
                 if (!(final_page >= KERNEL_ENTRYPOINT && final_page <= KERNEL_END)){
                     // printk("[recycle] error final_page 0x%lx!\n",final_page);

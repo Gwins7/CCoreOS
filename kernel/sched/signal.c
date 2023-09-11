@@ -7,7 +7,7 @@
 regs_context_t signal_context_buf;
 switchto_context_t signal_switch_buf;
 
-sigaction_table_t sig_table[MAX_SIGNAL_NUM];
+sigaction_table_t sig_table[NUM_MAX_TASK];
 /**
  * @brief used to fetch and/or change the signal mask of
  * the calling thread.  The signal mask is the set of signals whose
@@ -202,6 +202,8 @@ void handle_signal()
         return;
     }
     // need run
+    if (!current_running->utime)
+        return;
     current_running->is_handle_signal = 1;
 
     for (uint8_t i = 0; i < NUM_SIG; i++)
@@ -401,7 +403,7 @@ uintptr_t set_ucontext()
 }
 
 void init_sig_table(){
-    for (int i = 0; i < MAX_SIGNAL_NUM; i++)
+    for (int i = 0; i < NUM_MAX_TASK; i++)
     {
         sig_table[i].num = 0;
         sig_table[i].used = 0;
@@ -410,7 +412,7 @@ void init_sig_table(){
 }
 
 sigaction_t *alloc_sig_table(){
-    for (int i = 0; i < MAX_SIGNAL_NUM; i++)
+    for (int i = 0; i < NUM_MAX_TASK; i++)
     {
         if(sig_table[i].used == 0){
             // printk("get: %d\n", i);

@@ -54,6 +54,7 @@ uint8_t disk_write(uint8_t *data_buff, uint32_t sector, uint32_t count)
 uint8_t disk_read_bio(struct buf *a, uint32_t num)
 {
     // printk("start read bio for sector %d\n",a->sectorno);
+    if (a->sectorno >= 500000) return 1;
     uint8_t r = sd_read_sector_bio(a, num);
     // printk("read bio done!\n");
     return r;
@@ -61,51 +62,8 @@ uint8_t disk_read_bio(struct buf *a, uint32_t num)
 uint8_t disk_write_bio(struct buf *a, uint32_t num)
 {
     // printk("start write bio\n");
+    if (a->sectorno >= 500000) return 1;
     uint8_t r = sd_write_sector_bio(a, num);
     // printk("write bio done!\n");
     return r;
-}
-
-/* for swap read */ 
-uint8_t disk_read_swap(uint8_t *data_buff, uint32_t sector, uint32_t count)
-{
-    #ifdef k210
-        // printk("enter ");
-        for (int i = 0; i < count; i++)
-        {
-            sd_read_sector(data_buff + 512 * i, sector + i, 1);
-        }
-        // disk_read(data_buff, sector, count);
-        // printk("leave\n");
-    #else
-        // printk("enter swap read\n");
-        // for (int i = 0; i < count; i++)
-        // {
-            kmemcpy(data_buff, SWAP_QEMU_DISK + (sector << 9), 512 * count);
-        // }
-        // printk("leave swap read\n");
-            
-    #endif
-
-}
-
-/* for swap write */ 
-uint8_t disk_write_swap(uint8_t *data_buff, uint32_t sector, uint32_t count)
-{
-    #ifdef k210
-        // printk("enter ");
-        for (int i = 0; i < count; i++)
-        {
-            sd_write_sector(data_buff + 512 * i, sector + i, 1);
-        }
-        // printk("leave \n");
-    #else
-        // printk("enter swap read\n");
-        // for (int i = 0; i < count; i++)
-        // {
-            kmemcpy(SWAP_QEMU_DISK + (sector << 9), data_buff, 512 * count);
-        // }
-        // printk("enter swap read\n");    
-    #endif
-
 }
